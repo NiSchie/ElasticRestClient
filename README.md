@@ -19,13 +19,14 @@ A lightweight Java client for interacting with Elasticsearch via REST, supportin
 
 ### Installation
 #### Maven Dependency
-Add the following dependency to your `pom.xml`:
+Not released yet.
+<!--Add the following dependency to your `pom.xml`:
 ```xml
 <dependency>
     <groupId>io.github.nischie</groupId>
     <artifactId>elasticrestclient</artifactId>
 </dependency>
-```
+```-->
 
 #### Building from source
 1. Clone the repository:
