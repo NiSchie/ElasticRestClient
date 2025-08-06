@@ -26,7 +26,7 @@ class DocumentClientIT extends BaseIT{
         var id = testData.newId();
         var resp = elasticClient.document().index(TEST_INDEX, id, TEST_DOCUMENT_SOURCE);
         assertNotNull(resp);
-        JSONObject response = new JSONObject(resp.body(Map.class));
+        JSONObject response = new JSONObject(resp.getBody());
         assertEquals("created", response.optString("result"));
         var doc = elasticClient.document().getDocument(TEST_INDEX, id);
         org.skyscreamer.jsonassert.JSONAssert.assertEquals(
@@ -40,7 +40,7 @@ class DocumentClientIT extends BaseIT{
     void testAutoIdIndexMap() throws JsonProcessingException {
         var resp = elasticClient.document().index(TEST_INDEX, TEST_DOCUMENT_SOURCE);
         assertNotNull(resp);
-        JSONObject response = new JSONObject(resp.body(Map.class));
+        JSONObject response = new JSONObject(resp.getBody());
         assertEquals("created", response.optString("result"));
         var doc = elasticClient.document().getDocument(TEST_INDEX, Id.of(response.getString("_id")));
         org.skyscreamer.jsonassert.JSONAssert.assertEquals(
@@ -58,7 +58,7 @@ class DocumentClientIT extends BaseIT{
         );
         var resp = elasticClient.document().index(TEST_INDEX, id, testDoc);
         assertNotNull(resp);
-        assertEquals("created", resp.body(Map.class).get("result"));
+        assertEquals("created", resp.getBody().get("result"));
         var maxTries = 3;
         List<ElasticDocument> searchDocuments = new ArrayList<>();
         do {
@@ -68,19 +68,19 @@ class DocumentClientIT extends BaseIT{
 
         assertEquals(1, searchDocuments.size());
 
-        resp = elasticClient.document().deleteByMatchQuery(TEST_INDEX, new StringSearchQuery("string: \"searchMe\""));
-        var d = resp.body(Map.class);
+        resp = elasticClient.document().deleteByStringQuery(TEST_INDEX, new StringSearchQuery("string: \"searchMe\""));
+        var d = resp.getBody();
         assertEquals(1, d.get("deleted"));
     }
 
     @Test
     void testCount() throws JsonProcessingException, InterruptedException {
-        var resp = elasticClient.document().index(TEST_INDEX, testData.newId(), TEST_DOCUMENT_SOURCE);
+        var resp = elasticClient.document().index(TEST_INDEX, testData.newId(), Map.of("string", "valuecountSearch"));
         assertNotNull(resp);
-        var count = elasticClient.document().countByQuery(TEST_INDEX, new StringSearchQuery("string: \"value\""));
+        var count = elasticClient.document().countByQuery(TEST_INDEX, new StringSearchQuery("string: \"valuecountSearch\""));
         var maxTries = 3;
         while (count == null || count == 0 && --maxTries > 0) {
-            count = elasticClient.document().countByQuery(TEST_INDEX, new StringSearchQuery("string: \"value\""));
+            count = elasticClient.document().countByQuery(TEST_INDEX, new StringSearchQuery("string: \"valuecountSearch\""));
             Thread.sleep(1000 * (4 - maxTries));
         }
         assertEquals(1, count);
@@ -91,10 +91,10 @@ class DocumentClientIT extends BaseIT{
         var id = testData.newId();
         var resp = elasticClient.document().index(TEST_INDEX, id, TEST_DOCUMENT_SOURCE);
         assertNotNull(resp);
-        assertEquals("created", resp.body(Map.class).get("result"));
+        assertEquals("created", resp.getBody().get("result"));
         Thread.sleep(3000);
         // Test delete
-        var deleteResponse = elasticClient.document().delete(TEST_INDEX, id).body(Map.class);
+        var deleteResponse = elasticClient.document().delete(TEST_INDEX, id).getBody();
         assertNotNull(deleteResponse);
         assertEquals("deleted", deleteResponse.get("result"));
         Thread.sleep(1000);
@@ -114,7 +114,7 @@ class DocumentClientIT extends BaseIT{
         elasticClient.index().deleteIndex(TEST_INDEX);
         var resp = elasticClient.document().index(TEST_INDEX, id, TestData.getTestPOJO());
         assertNotNull(resp);
-        JSONObject response = new JSONObject(resp.body(Map.class));
+        JSONObject response = new JSONObject(resp.getBody());
         assertEquals("created",response.optString("result"));
 
         var doc = elasticClient.document().getDocument(TEST_INDEX, id);

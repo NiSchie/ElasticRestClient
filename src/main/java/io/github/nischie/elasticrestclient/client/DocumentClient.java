@@ -12,6 +12,7 @@ import io.github.nischie.elasticrestclient.domain.queries.UpdateByStringQuery;
 import io.github.nischie.elasticrestclient.util.JsonUtil;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ServerErrorException;
 
@@ -48,30 +49,32 @@ public class DocumentClient {
      * @param index the index to store the document in
      * @param id the document ID
      * @param document the document object to serialize and store
-     * @return the response specification from the RestClient
+     * @return the response entity of the rest request
      * @throws com.fasterxml.jackson.core.JsonProcessingException if serialization fails
      */
-    public RestClient.ResponseSpec index(Index index, Id id, Object document) throws JsonProcessingException {
+    public ResponseEntity<Map> index(Index index, Id id, Object document) throws JsonProcessingException {
         String json = JsonUtil.serialize(document);
         return restClient.put()
                 .uri(index._index() + "/_doc/" + id._id())
                 .body(json)
-                .retrieve();
+                .retrieve()
+                .toEntity(Map.class);
     }
     /**
      * Indexes (creates or updates) a document in the specified index without specifying an ID.
      *
      * @param index the index to store the document in
      * @param document the document object to serialize and store
-     * @return the response specification from the RestClient
+     * @return the response entity of the rest request
      * @throws com.fasterxml.jackson.core.JsonProcessingException if serialization fails
      */
-    public RestClient.ResponseSpec index(Index index, Object document) throws JsonProcessingException {
+    public ResponseEntity<Map> index(Index index, Object document) throws JsonProcessingException {
         String json = JsonUtil.serialize(document);
         return restClient.post()
                 .uri(index._index() + "/_doc/")
                 .body(json)
-                .retrieve();
+                .retrieve()
+                .toEntity(Map.class);
     }
 
     /**
@@ -105,12 +108,13 @@ public class DocumentClient {
      *
      * @param index the index to delete from
      * @param id the document ID
-     * @return the response specification from the RestClient
+     * @return the response entity of the rest request
      */
-    public RestClient.ResponseSpec delete(Index index, Id id) {
+    public ResponseEntity<Map> delete(Index index, Id id) {
         return restClient.delete()
                 .uri(index._index() + "/_doc/" + id._id())
-                .retrieve();
+                .retrieve()
+                .toEntity(Map.class);
     }
 
     /**
@@ -155,23 +159,25 @@ public class DocumentClient {
      *
      * @param index the index to delete from
      * @param query the match query
-     * @return the response specification from the RestClient
+     * @return the response entity of the rest request
      * @throws com.fasterxml.jackson.core.JsonProcessingException if serialization fails
      */
-    public RestClient.ResponseSpec deleteByStringQuery(Index index, StringSearchQuery query) throws JsonProcessingException {
+    public ResponseEntity<Map> deleteByStringQuery(Index index, StringSearchQuery query) throws JsonProcessingException {
             String queryBody = JsonUtil.serialize(query);
             return restClient.post()
                     .uri(index._index() + "/_delete_by_query")
                     .body(queryBody)
-                    .retrieve();
+                    .retrieve()
+                    .toEntity(Map.class);
     }
 
-    public RestClient.ResponseSpec updateByStringQuery(Index index, StringSearchQuery query, Field field, Value value) throws JsonProcessingException {
+    public ResponseEntity<Map> updateByStringQuery(Index index, StringSearchQuery query, Field field, Value value) throws JsonProcessingException {
         String queryBody = JsonUtil.serialize(UpdateByStringQuery.of(query, field, value));
         return restClient.post()
                 .uri(index._index() + "/_update_by_query")
                 .body(queryBody)
-                .retrieve();
+                .retrieve()
+                .toEntity(Map.class);
     }
 
     /**

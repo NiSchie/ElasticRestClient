@@ -1,6 +1,7 @@
 package io.github.nischie.elasticrestclient.client;
 
 import io.github.nischie.elasticrestclient.domain.model.Index;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
 import java.util.Map;
@@ -28,23 +29,25 @@ public class IndexClient {
      * Creates an index with the specified name and optional mapping.
      *
      * @param index the index to create
-     * @return the response specification from the RestClient
+     * @return the response entity of the rest request
      */
-    public RestClient.ResponseSpec createIndex(Index index) {
+    public ResponseEntity<Map> createIndex(Index index) {
         return restClient.put()
                 .uri(index._index())
-                .retrieve();
+                .retrieve()
+                .toEntity(Map.class);
     }
     /**
      * Deletes the specified index.
      *
      * @param index the index to delete
-     * @return the response specification from the RestClient
+     * @return the response entity of the rest request
      */
-    public RestClient.ResponseSpec deleteIndex(Index index) {
+    public ResponseEntity<Map> deleteIndex(Index index) {
         return restClient.delete()
                 .uri(index._index())
-                .retrieve();
+                .retrieve()
+                .toEntity(Map.class);
     }
     /**
      * Checks if the specified index exists.
@@ -72,12 +75,13 @@ public class IndexClient {
      *
      * @param index the index to add the alias to
      * @param aliasName the name of the alias to add
-     * @return the response specification from the RestClient
+     * @return the response entity of the rest request
      */
-    public RestClient.ResponseSpec alias(Index index, String aliasName) {
+    public ResponseEntity<Map> alias(Index index, String aliasName) {
         return restClient.post()
                 .uri(index._index() + "/_alias/" + aliasName)
-                .retrieve();
+                .retrieve()
+                .toEntity(Map.class);
     }
 
     /**

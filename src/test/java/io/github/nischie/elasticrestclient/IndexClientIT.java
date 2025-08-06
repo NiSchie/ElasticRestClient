@@ -18,12 +18,12 @@ class IndexClientIT extends BaseIT{
     void testIndexClient() throws JsonProcessingException, InterruptedException {
         var indexClient = elasticClient.index();
         var index = Index.of("indexclienttest");
-        var created = indexClient.createIndex(index).body(Map.class);
+        var created = indexClient.createIndex(index).getBody();
         assertNotNull(created);
         assertEquals(true, created.get("acknowledged"));
         var isExists = indexClient.indexExists(index);
         assertTrue(isExists);
-        var aliased = indexClient.alias(index, "aliasIndexName").body(Map.class);
+        var aliased = indexClient.alias(index, "aliasIndexName").getBody();
         assertNotNull(aliased);
         var aliases = indexClient.getAliases(index);
         assertEquals(1, aliases.keySet().size());
