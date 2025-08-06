@@ -115,6 +115,7 @@ public class DocumentClient {
 
     /**
      * Searches for documents in the specified index using a StringSearchQuery.
+     * The default result size maximum is 1000.
      *
      * @param index the index to search in
      * @param query the search query
@@ -123,7 +124,26 @@ public class DocumentClient {
      */
     public List<ElasticDocument> searchDocuments(Index index, StringSearchQuery query) throws JsonProcessingException {
         var response = restClient.post()
-                .uri(index._index() + "/_search")
+                .uri(index._index() + "/_search?size=1000")
+                .body(JsonUtil.serialize(query))
+                .retrieve()
+                .body(ElasticDocumentSearchResult.class);
+        return response.searchHits();
+    }
+
+    /**
+     * Searches for documents in the specified index using a StringSearchQuery.
+     * The result size is set specifically.
+     *
+     * @param index the index to search in
+     * @param query the search query
+     * @param size the maximum search result size
+     * @return a list of ElasticDocument search hits
+     * @throws com.fasterxml.jackson.core.JsonProcessingException if serialization fails
+     */
+    public List<ElasticDocument> searchDocuments(Index index, StringSearchQuery query, Integer size) throws JsonProcessingException {
+        var response = restClient.post()
+                .uri(index._index() + "/_search?size="+size)
                 .body(JsonUtil.serialize(query))
                 .retrieve()
                 .body(ElasticDocumentSearchResult.class);
