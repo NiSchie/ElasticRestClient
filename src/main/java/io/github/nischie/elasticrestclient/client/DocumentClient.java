@@ -138,7 +138,7 @@ public class DocumentClient {
      * @return the response specification from the RestClient
      * @throws com.fasterxml.jackson.core.JsonProcessingException if serialization fails
      */
-    public RestClient.ResponseSpec deleteByMatchQuery(Index index, StringSearchQuery query) throws JsonProcessingException {
+    public RestClient.ResponseSpec deleteByStringQuery(Index index, StringSearchQuery query) throws JsonProcessingException {
             String queryBody = JsonUtil.serialize(query);
             return restClient.post()
                     .uri(index._index() + "/_delete_by_query")
@@ -146,7 +146,7 @@ public class DocumentClient {
                     .retrieve();
     }
 
-    public RestClient.ResponseSpec updateByMatchQuery(Index index, StringSearchQuery query, Field field, Value value) throws JsonProcessingException {
+    public RestClient.ResponseSpec updateByStringQuery(Index index, StringSearchQuery query, Field field, Value value) throws JsonProcessingException {
         String queryBody = JsonUtil.serialize(UpdateByStringQuery.of(query, field, value));
         return restClient.post()
                 .uri(index._index() + "/_update_by_query")
