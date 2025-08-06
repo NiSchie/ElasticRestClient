@@ -50,7 +50,7 @@ public class JsonUtil {
         try {
             return objectMapper.convertValue(source, clazz);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Failed to map source to POJO", e);
+            throw new RuntimeException("Failed to map source to "+clazz.getName(), e);
         }
     }
 }

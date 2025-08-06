@@ -3,9 +3,12 @@ package io.github.nischie.elasticrestclient.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.nischie.elasticrestclient.domain.documents.ElasticDocument;
 import io.github.nischie.elasticrestclient.domain.documents.ElasticDocumentSearchResult;
+import io.github.nischie.elasticrestclient.domain.model.Field;
 import io.github.nischie.elasticrestclient.domain.model.Id;
 import io.github.nischie.elasticrestclient.domain.model.Index;
+import io.github.nischie.elasticrestclient.domain.model.Value;
 import io.github.nischie.elasticrestclient.domain.queries.StringSearchQuery;
+import io.github.nischie.elasticrestclient.domain.queries.UpdateByStringQuery;
 import io.github.nischie.elasticrestclient.util.JsonUtil;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatusCode;
@@ -141,6 +144,14 @@ public class DocumentClient {
                     .uri(index._index() + "/_delete_by_query")
                     .body(queryBody)
                     .retrieve();
+    }
+
+    public RestClient.ResponseSpec updateByMatchQuery(Index index, StringSearchQuery query, Field field, Value value) throws JsonProcessingException {
+        String queryBody = JsonUtil.serialize(UpdateByStringQuery.of(query, field, value));
+        return restClient.post()
+                .uri(index._index() + "/_update_by_query")
+                .body(queryBody)
+                .retrieve();
     }
 
     /**
