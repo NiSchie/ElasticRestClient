@@ -91,10 +91,11 @@ public class BulkClient {
      */
     public void executeBulk(Boolean force) {
         if ((force || bulkRequests.size() > 10000) && !bulkRequests.isEmpty()) {
-            String body = bulkRequests.stream().reduce((a, b) -> a + "\n" + b).orElse("");
+            StringBuilder bodyBuffer =  new StringBuilder();
+            bulkRequests.forEach(bodyBuffer::append);
             var response = restClient.post()
                     .uri("_bulk")
-                    .body(body)
+                    .body(bodyBuffer.toString())
                     .retrieve()
                     .body(Map.class);
             bulkRequests.clear();
