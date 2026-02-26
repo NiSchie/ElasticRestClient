@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * Utility class for JSON operations, including serialization and conversion to POJOs.
- * Uses Jackson for JSON processing and supports org.json types.
+ * Uses Jackson for JSON processing and supports ObjectNode.
  *
  * @author nschieschke
  * @version $Id: $Id
@@ -22,7 +22,6 @@ public class JsonUtil {
 
     /**
      * Serializes an object to a JSON string.
-     * If the object is an instance of org.json.JSONObject or org.json.JSONArray, it returns its string representation.
      * Otherwise, it uses Jackson's ObjectMapper to serialize the object.
      *
      * @param obj the object to serialize
@@ -30,11 +29,7 @@ public class JsonUtil {
      * @throws com.fasterxml.jackson.core.JsonProcessingException if serialization fails
      */
     public static String serialize(Object obj) throws JsonProcessingException {
-        if (obj instanceof org.json.JSONObject || obj instanceof org.json.JSONArray) {
-            return obj.toString();
-        } else {
-            return objectMapper.writeValueAsString(obj);
-        }
+        return objectMapper.writeValueAsString(obj);
     }
 
     /**

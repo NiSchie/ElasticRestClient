@@ -1,6 +1,7 @@
 package io.github.nischie.elasticrestclient.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.nischie.elasticrestclient.domain.documents.ElasticDocument;
 import io.github.nischie.elasticrestclient.domain.documents.ElasticDocumentSearchResult;
 import io.github.nischie.elasticrestclient.domain.model.Field;
@@ -10,7 +11,6 @@ import io.github.nischie.elasticrestclient.domain.model.Value;
 import io.github.nischie.elasticrestclient.domain.queries.StringSearchQuery;
 import io.github.nischie.elasticrestclient.domain.queries.UpdateByStringQuery;
 import io.github.nischie.elasticrestclient.util.JsonUtil;
-import org.json.JSONObject;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
@@ -190,13 +190,13 @@ public class DocumentClient {
     public Long countByQuery(Index index, StringSearchQuery query) {
         try {
             String queryBody = JsonUtil.serialize(query);
-            var response = new JSONObject(restClient
+            var response = new ObjectNode(restClient
                     .post()
                     .uri(index._index() + "/_count")
                     .body(queryBody)
                     .retrieve()
-                    .body(Map.class));
-            return response.getLong("count");
+                    .body(com.fasterxml.jackson.databind.node.JsonNodeFactory.class));
+            return response.get("count").asLong();
         } catch (Exception e) {
             return null;
         }

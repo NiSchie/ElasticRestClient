@@ -1,12 +1,13 @@
 package io.github.nischie.elasticrestclient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.nischie.elasticrestclient.client.ElasticRestClient;
 import io.github.nischie.elasticrestclient.domain.documents.ElasticDocument;
 import io.github.nischie.elasticrestclient.domain.model.Id;
 import io.github.nischie.elasticrestclient.domain.queries.StringSearchQuery;
 import io.github.nischie.elasticrestclient.util.JsonUtil;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -26,8 +27,8 @@ class DocumentClientIT extends BaseIT{
         var id = testData.newId();
         var resp = elasticClient.document().index(TEST_INDEX, id, TEST_DOCUMENT_SOURCE);
         assertNotNull(resp);
-        JSONObject response = new JSONObject(resp.getBody());
-        assertEquals("created", response.optString("result"));
+        ObjectNode response = new ObjectMapper().valueToTree(resp.getBody());
+        assertEquals("created", response.get("result").asText());
         var doc = elasticClient.document().getDocument(TEST_INDEX, id);
         org.skyscreamer.jsonassert.JSONAssert.assertEquals(
                 JsonUtil.serialize(TEST_DOCUMENT_SOURCE),
@@ -40,9 +41,9 @@ class DocumentClientIT extends BaseIT{
     void testAutoIdIndexMap() throws JsonProcessingException {
         var resp = elasticClient.document().index(TEST_INDEX, TEST_DOCUMENT_SOURCE);
         assertNotNull(resp);
-        JSONObject response = new JSONObject(resp.getBody());
-        assertEquals("created", response.optString("result"));
-        var doc = elasticClient.document().getDocument(TEST_INDEX, Id.of(response.getString("_id")));
+        ObjectNode response = new ObjectMapper().valueToTree(resp.getBody());
+        assertEquals("created", response.path("result").asText());
+        var doc = elasticClient.document().getDocument(TEST_INDEX, Id.of(response.path("_id").asText()));
         org.skyscreamer.jsonassert.JSONAssert.assertEquals(
                 JsonUtil.serialize(TEST_DOCUMENT_SOURCE),
                 JsonUtil.serialize(doc.source()),
@@ -114,8 +115,8 @@ class DocumentClientIT extends BaseIT{
         elasticClient.index().deleteIndex(TEST_INDEX);
         var resp = elasticClient.document().index(TEST_INDEX, id, TestData.getTestPOJO());
         assertNotNull(resp);
-        JSONObject response = new JSONObject(resp.getBody());
-        assertEquals("created",response.optString("result"));
+        ObjectNode response = new ObjectMapper().valueToTree(resp.getBody());
+        assertEquals("created", response.path("result").asText());
 
         var doc = elasticClient.document().getDocument(TEST_INDEX, id);
         assertNotNull(doc);

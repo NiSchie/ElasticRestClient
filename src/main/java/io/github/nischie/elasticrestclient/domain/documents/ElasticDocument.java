@@ -2,8 +2,11 @@ package io.github.nischie.elasticrestclient.domain.documents;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.nischie.elasticrestclient.util.JsonUtil;
-import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -28,28 +31,32 @@ public record ElasticDocument(
         @JsonProperty("_source") Map<String, Object> source
 ) {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
     /**
-     * Converts the entire document (including metadata) to a JSONObject.
+     * Converts the entire document (including metadata) to a Jackson ObjectNode.
      *
-     * @return a JSONObject representation of the document
+     * @return a Jackson ObjectNode representation of the document
      */
-    public JSONObject toJSON() {
-        var json = new JSONObject();
-        json.put("_index", index);
-        json.put("_id", id);
-        json.put("_version", version);
-        json.put("_type", type);
-        json.put("_source", source);
+    public ObjectNode toJSON() {
+        ObjectNode json = MAPPER.createObjectNode();
+        if (index != null) json.put("_index", index);
+        if (id != null) json.put("_id", id);
+        if (version != null) json.put("_version", version);
+        if (type != null) json.put("_type", type);
+        if (source != null) json.set("_source", MAPPER.valueToTree(source));
         return json;
     }
 
     /**
-     * Converts the document source to a JSONObject.
+     * Converts the document source to a Jackson ObjectNode.
      *
-     * @return a JSONObject representation of the source map
+     * @return a Jackson ObjectNode representation of the source map
      */
-    public JSONObject sourceAsJSON() {
-        return new JSONObject(source);
+    public ObjectNode sourceAsJSON() {
+        return MAPPER.valueToTree(source);
     }
 
     /**

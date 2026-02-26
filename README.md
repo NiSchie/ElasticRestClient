@@ -8,7 +8,7 @@ A lightweight Java client for interacting with Elasticsearch via REST, supportin
 - Flexible search with query string and match queries
 - Scrollable search for large result sets
 - Index management (delete, alias)
-- Handles both POJOs and org.json (JSONObject/JSONArray) for document bodies
+- Handles both POJOs and Jackson ObjectNode for document bodies
 
 ## Getting Started
 
@@ -60,8 +60,9 @@ client.document().index(index, id, doc); // POJO or Map, allows update if exists
 //index only with auto-generated ID
 client.document().index(index, doc); // No ID specified, Elasticsearch generates one
 
-// Or using JSONObject
-JSONObject jsonDoc = new JSONObject(doc);
+// Or using Jackson ObjectNode
+com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+com.fasterxml.jackson.databind.node.ObjectNode jsonDoc = mapper.valueToTree(doc);
 client.document().index(index, id, jsonDoc);
 ```
 
@@ -80,10 +81,10 @@ After retrieving a document, you can access its source and metadata:
 if (doc != null) {
     // Get the source as a Map
     Map<String, Object> source = doc.source();
-    // Get the source as a JSONObject
-    JSONObject sourceJson = doc.sourceAsJSON();
-    // Get the entire document (including metadata) as a JSONObject
-    JSONObject fullJson = doc.toJSON();
+    // Get the source as a Jackson ObjectNode
+    com.fasterxml.jackson.databind.node.ObjectNode sourceJson = doc.sourceAsJSON();
+    // Get the entire document (including metadata) as a Jackson ObjectNode
+    com.fasterxml.jackson.databind.node.ObjectNode fullJson = doc.toJSON();
     // Parse the source directly into a POJO
     MyPojo pojo = doc.sourceAs(MyPojo.class);
 }
@@ -113,7 +114,7 @@ client.document().deleteByMatchQuery(index, query);
 ### 9. Bulk Operations
 ```java
 BulkClient bulk = client.bulk();
-bulk.addIndexRequest(index, id, doc); // POJO, Map, or JSONObject
+bulk.addIndexRequest(index, id, doc); // POJO, Map, or Jackson ObjectNode
 bulk.addUpdateRequest(index, id, Map.of("field", "newValue")); // Update specific fields
 bulk.addDeleteRequest(index, id);
 bulk.executeBulk(true); // Force execution
@@ -138,6 +139,6 @@ client.index().alias(index, "alias-name");
 ```
 
 ## Notes
-- All document methods accept POJOs, Maps, or org.json.JSONObject/JSONArray.
+- All document methods accept POJOs, Maps, or Jackson `ObjectNode`/`ArrayNode`.
 - JSON serialization is handled automatically.
 - Error handling: `getDocument` returns `null` if not found; other methods throw on error.
