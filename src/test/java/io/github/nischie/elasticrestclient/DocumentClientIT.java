@@ -30,10 +30,9 @@ class DocumentClientIT extends BaseIT{
         ObjectNode response = new ObjectMapper().valueToTree(resp.getBody());
         assertEquals("created", response.get("result").asText());
         var doc = elasticClient.document().getDocument(TEST_INDEX, id);
-        org.skyscreamer.jsonassert.JSONAssert.assertEquals(
+        assertEquals(
                 JsonUtil.serialize(TEST_DOCUMENT_SOURCE),
-                JsonUtil.serialize(doc.source()),
-                true
+                JsonUtil.serialize(doc.source())
         );
     }
 
@@ -44,10 +43,9 @@ class DocumentClientIT extends BaseIT{
         ObjectNode response = new ObjectMapper().valueToTree(resp.getBody());
         assertEquals("created", response.path("result").asText());
         var doc = elasticClient.document().getDocument(TEST_INDEX, Id.of(response.path("_id").asText()));
-        org.skyscreamer.jsonassert.JSONAssert.assertEquals(
+        assertEquals(
                 JsonUtil.serialize(TEST_DOCUMENT_SOURCE),
-                JsonUtil.serialize(doc.source()),
-                true
+                JsonUtil.serialize(doc.source())
         );
     }
 

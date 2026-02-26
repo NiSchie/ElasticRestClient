@@ -29,11 +29,9 @@ class BulkClientIT extends BaseIT{
                 Thread.sleep(1000);
             }
         }
-        org.skyscreamer.jsonassert.JSONAssert.assertEquals(
-                JsonUtil.serialize(TEST_DOCUMENT_SOURCE),
-                JsonUtil.serialize(doc.source()),
-                true
-        );
+        assertNotNull(doc);
+        assertEquals(JsonUtil.serialize(TEST_DOCUMENT_SOURCE),
+                JsonUtil.serialize(doc.source()));
         elasticClient.bulk().addUpdateRequest(TEST_INDEX, id, Map.of("newKey", "value"));
         elasticClient.bulk().executeBulk(true);
         doc = elasticClient.document().getDocument(TEST_INDEX, id);
